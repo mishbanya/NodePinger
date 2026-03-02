@@ -12,9 +12,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import org.koin.android.annotation.KoinViewModel
 import ru.mishbanya.nodepinger.domain.vm.model.MainScreenUiState
+import ru.mishbanya.nodepinger.model.repository.NodePinger
 
 @KoinViewModel
-class MainScreenViewModel : ViewModel() {
+class MainScreenViewModel(
+    private val nodePinger: NodePinger
+) : ViewModel() {
 
     private val scope = viewModelScope + Dispatchers.IO + SupervisorJob()
 
@@ -32,19 +35,30 @@ class MainScreenViewModel : ViewModel() {
         scope.launch {
             try {
                 val startTime = System.currentTimeMillis()
-                // Здесь должна быть логика пинга ноды по CID
-                // Например, можно использовать HTTP клиент для отправки запроса к ноде
-                // И получать результат и время ответа
-                val result = "Пинг успешен для CID: $cid" // Заглушка результата
+
+                val pingResponse = nodePinger.pingNode(cid)
                 val latency = System.currentTimeMillis() - startTime
 
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        result = result,
-                        latency = latency.toString(),
-                        error = null
-                    )
+                if(pingResponse.isSuccess){
+                    val result = pingResponse.getOrNull() ?: "Пинг выполнен успешно, но результат пустой"
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            result = result,
+                            latency = latency.toString(),
+                            error = null
+                        )
+                    }
+                } else {
+                    val errorMessage = pingResponse.exceptionOrNull()?.localizedMessage ?: "Неизвестная ошибка при пинге"
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            result = null,
+                            latency = null,
+                            error = errorMessage
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update {
