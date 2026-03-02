@@ -8,7 +8,6 @@ import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.ksp.generated.module
 import ru.mishbanya.nodepinger.util.AppConfig
-import ru.mishbanya.nodepingertest.NodePingerModule
 
 class NodePingerApp: Application() {
     override fun onCreate() {
