@@ -19,7 +19,6 @@ import java.util.Optional
 import java.util.concurrent.CompletableFuture
 
 //https://github.com/Peergos/nabu/blob/master/src/test/java/org/peergos/EmbeddedIpfsTest.java
-//https://github.com/Peergos/nabu/blob/master/src/main/java/org/peergos/EmbeddedIpfs.java
 @Single(binds = [NodePinger::class])
 class NodePingerImpl : NodePinger {
 
