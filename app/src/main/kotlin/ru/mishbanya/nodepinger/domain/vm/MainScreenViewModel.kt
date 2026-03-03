@@ -40,7 +40,8 @@ class MainScreenViewModel(
         scope.launch {
             while (isActive){
                 try {
-                    val latency = nodePinger.pingNode()
+                    val latency = nodePinger.pingNode(pingingIntervalMillis.value)
+                    println(latency)
                     _uiState.update { it.copy(latency = latency.toString(), latencyError = false) }
                 } catch (e: Exception) {
                     _uiState.update { it.copy(latencyError = true, latency = null) }

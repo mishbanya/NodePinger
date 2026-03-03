@@ -7,6 +7,7 @@ import kotlinx.io.files.SystemFileSystem
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.ksp.generated.module
+import org.peergos.EmbeddedIpfs
 import ru.mishbanya.nodepinger.util.AppConfig
 
 class NodePingerApp: Application() {
@@ -34,5 +35,14 @@ class NodePingerApp: Application() {
             modules(appModule)
             modules(NodePingerModule().module)
         }
+    }
+
+    override fun onTerminate() {
+        try {
+            val ipfs = GlobalContext.get().getOrNull<EmbeddedIpfs>()
+            ipfs?.stop()?.join()
+        } catch (_: Exception) {
+        }
+        super.onTerminate()
     }
 }

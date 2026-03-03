@@ -1,35 +1,25 @@
 package ru.mishbanya.nodepinger.domain.repositoryImpl
 
-import io.libp2p.core.multiformats.Multiaddr
+import io.libp2p.protocol.PingController
 import org.koin.core.annotation.Single
-import org.peergos.EmbeddedIpfs
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import ru.mishbanya.nodepinger.model.repository.NodePinger
-import ru.mishbanya.nodepinger.model.routing.NabuRouting
+import java.util.concurrent.TimeUnit
 
+//https://github.com/libp2p/jvm-libp2p
 @Single(binds = [NodePinger::class])
-class NodePingerImpl(
-    private val ipfs: EmbeddedIpfs
-) : NodePinger {
+class NodePingerImpl : NodePinger, KoinComponent {
 
-    override fun pingNode(): Long {
+    private val controller: PingController by inject()
+
+    override fun pingNode(timeoutMillis: Long): Long {
         try {
-            ipfs.start()
-
-            val nodeMultiaddr = Multiaddr(NabuRouting.nodeAddress)
-
-            val startTime = System.currentTimeMillis()
-            ipfs.node.network.connect(nodeMultiaddr).get()
-            val endTime = System.currentTimeMillis()
-
-            return endTime - startTime
+            val latency = controller.ping().get(timeoutMillis, TimeUnit.MILLISECONDS)
+            return latency
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
-        } finally {
-            try {
-                ipfs.stop()?.join()
-            } catch (_: Exception) {
-            }
         }
     }
 }
