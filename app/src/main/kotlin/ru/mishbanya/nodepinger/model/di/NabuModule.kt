@@ -29,7 +29,7 @@ class NabuModule {
             RamRecordStore(),
             RamBlockstore(),
             true,
-            listOf(MultiAddress("/ip4/0.0.0.0/tcp/0")), //Пустой список для локальных слушающих адресов
+            listOf(MultiAddress("/ip4/127.0.0.1/tcp/0")), // Слушать на localhost, порт назначит ОС
             bootstrapAddresses,
             IdentitySection(builder.privateKey.bytes(), builder.peerId),
             { _, _, _ ->
