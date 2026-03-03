@@ -20,11 +20,9 @@ class NodePingerApp: Application() {
         val appModule = module {
             single {
                 AppConfig(
-                    directory = Path(
-                        System.getenv("LOCALAPPDATA") ?: System.getProperty("user.home"), appDirName
-                    ).apply {
+                    directory = Path(filesDir.absolutePath, appDirName).apply {
                         if (!SystemFileSystem.exists(this)) {
-                            SystemFileSystem.createDirectories(this, true)
+                            SystemFileSystem.createDirectories(this)
                         }
                     }
                 )

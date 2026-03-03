@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import ru.mishbanya.nodepinger.BuildConfig
 import ru.mishbanya.nodepinger.domain.vm.MainScreenViewModel
 
 @Composable
@@ -36,7 +37,7 @@ fun MainScreen(
         modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        var cid by remember { mutableStateOf("") }
+        var cid by remember { mutableStateOf(BuildConfig.TEST_CID) }
 
         TextField(
             value = cid,
