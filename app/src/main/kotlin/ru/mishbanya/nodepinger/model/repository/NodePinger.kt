@@ -1,7 +1,7 @@
 package ru.mishbanya.nodepinger.model.repository
 
 interface NodePinger {
-    fun pingNode(
+    suspend fun pingNode(
         timeoutMillis: Long
     ): Long
 }

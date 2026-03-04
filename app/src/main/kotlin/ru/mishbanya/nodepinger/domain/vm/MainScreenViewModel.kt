@@ -58,11 +58,11 @@ class MainScreenViewModel(
 
     fun sendWant(cid: String) {
         if (cid.isBlank()) {
-            _uiState.update { it.copy(error = "CID не может быть пустым", latency = null, result = null) }
+            _uiState.update { it.copy(error = "CID не может быть пустым", result = null) }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, error = null, latency = null, result = null) }
+        _uiState.update { it.copy(isLoading = true, error = null, result = null) }
 
         scope.launch {
             try {
