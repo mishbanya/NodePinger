@@ -19,39 +19,30 @@ class WantSenderImpl : WantSender, KoinComponent {
 
     private val ipfsProvider: EmbeddedIpfsProvider by inject()
 
+    private suspend fun send(cid: String): Result<String> {
+        val nodePeerId = PeerId.fromBase58(NabuRouting.nodeAddress.substringAfterLast("/p2p/"))
+
+        val blocks: List<HashedBlock> = ipfsProvider.get().getBlocks(
+            listOf(Want(Cid.decode(cid))),
+            setOf(nodePeerId),
+            false
+        )
+
+        return if (blocks.isNotEmpty()) {
+            val data = blocks[0].block.decodeToString().filter { it != '\uFFFD' }
+            Result.success(data)
+        } else {
+            Result.failure(Exception("Блок не найден"))
+        }
+    }
+
     override suspend fun sendWants(cid: String): Result<String> = withContext(Dispatchers.IO) {
         try {
-            val nodePeerId = PeerId.fromBase58(NabuRouting.nodeAddress.substringAfterLast("/p2p/"))
-
-            val blocks: List<HashedBlock> = ipfsProvider.get().getBlocks(
-                listOf(Want(Cid.decode(cid))),
-                setOf(nodePeerId),
-                false
-            )
-
-            if (blocks.isNotEmpty()) {
-                val data = blocks[0].block.toString(Charsets.UTF_8)
-                Result.success(data)
-            } else {
-                Result.failure(Exception("Блок не найден"))
-            }
+            send(cid)
         } catch (_: Exception) {
             try {
                 ipfsProvider.reconnect()
-                val nodePeerId = PeerId.fromBase58(NabuRouting.nodeAddress.substringAfterLast("/p2p/"))
-
-                val blocks: List<HashedBlock> = ipfsProvider.get().getBlocks(
-                    listOf(Want(Cid.decode(cid))),
-                    setOf(nodePeerId),
-                    false
-                )
-
-                if (blocks.isNotEmpty()) {
-                    val data = blocks[0].block.toString(Charsets.UTF_8)
-                    Result.success(data)
-                } else {
-                    Result.failure(Exception("Блок не найден"))
-                }
+                send(cid)
             } catch (retryException: Exception) {
                 retryException.printStackTrace()
                 Result.failure(retryException)
